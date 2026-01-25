@@ -27,11 +27,5 @@ A downstream analytical demo was developed to validate practical usability of Ce
 - Visualization
 - Trend analysis
 
-See: `demo/US-Population-Estimate-Analysis-and-Visualization.html`
-
-## Files
-- Final report: `report/Final-Product.pdf`
-- Demo analysis: `demo/US-Population-Estimate-Analysis-and-Visualization.html`
-
 ## Tools
 R, Census API, Data Cleaning, Visualization
