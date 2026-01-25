@@ -1,0 +1,98 @@
+## U.S. Population Estimate Analysis and Visualiztion
+
+
+### 1.Introduction
+This project used data from U.S. Census Bureau population Estimates(2020-2024) to explore population distribution and growth trends. I used the datasets to:
+
+1. Visualize the US population trends from 2020-2024
+
+2. Identify the Top 10 Regions with most population in 2023
+
+3. Identify the Top 10 states with fastest population growth
+
+### 2.Load the dataset and data cleaning
+```{r}
+library(tidyverse)
+library(readr)
+library(ggplot2)
+csv_url <- "https://www2.census.gov/programs-surveys/popest/datasets/2020-2024/state/totals/NST-EST2024-ALLDATA.csv"
+raw <- read_csv(csv_url, show_col_types = FALSE)
+head(raw)
+```
+```{r}
+states <- raw %>%
+  filter(NAME != "United States", STATE != 0)
+states <- states %>%
+  select(NAME, starts_with("POPESTIMATE"))
+head(states)
+```
+### 3.Data Visualiztion
+1-the plot shows the total population in US from 2020 to 2024. The population shows a steady and modest growth overtime.
+```{r}
+us_long <- raw %>%
+  filter(NAME == "United States") %>%
+  pivot_longer(
+    starts_with("POPESTIMATE"),
+    names_to = "year",
+    values_to = "population"
+  ) %>%
+  mutate(year = as.integer(str_remove(year, "POPESTIMATE")))
+ggplot(us_long, aes(year, population)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "U.S. Resident Population Estimates (2020–2024)",
+    x = "Year",
+    y = "Population"
+  ) +
+  theme_minimal()
+```
+
+2-The bar chart shows the Top 10 regions with most population in the US.
+```{r}
+states_2023 <- raw %>%
+  filter(NAME != "United States", STATE != 0) %>%
+  select(NAME, POPESTIMATE2023) %>%
+  arrange(desc(POPESTIMATE2023)) %>%
+  slice_head(n = 10) %>%
+  mutate(NAME = forcats::fct_reorder(NAME, POPESTIMATE2023))
+ggplot(states_2023, aes(x = NAME, y = POPESTIMATE2023)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Top 10 Regions by Resident Population (2023)",
+    x = NULL,
+    y = "Population (2023, estimate)"
+  ) +
+  theme_minimal()
+```
+
+3-This bar chart shows states with the highest population growth rates between 2020 and 2024.
+Southern and Mountain West states such as Texas, Florida, Idaho, and Utah lead the list, highlighting continued population migration toward the South and interior regions.
+```{r}
+growth_top10 <- raw %>%
+  filter(NAME != "United States", STATE != 0) %>%
+  transmute(
+    NAME,
+    pct_change = 100 * (POPESTIMATE2024 - POPESTIMATE2020) / POPESTIMATE2020
+  ) %>%
+  arrange(desc(pct_change)) %>%
+  slice_head(n = 10) %>%
+  mutate(NAME = fct_reorder(NAME, pct_change))
+p_growth_top10 <- ggplot(growth_top10, aes(x = NAME, y = pct_change)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  labs(
+    title = "State Resident Population Growth, 2020–2024 (Top 10)",
+    subtitle = "Source: U.S. Census Bureau, Vintage 2024",
+    x = NULL,
+    y = "Percent change (2020–2024)"
+  ) +
+  theme_minimal(base_size = 12)
+print(p_growth_top10)
+```
+### 4.Conclusion
+An analysis of the U.S. Census Bureau's 2024 population estimates clearly reveals demographic trends between 2020 and 2024. The U.S. population experienced moderate but steady growth, with an estimated increase of several million people over the four years. However, at the state level, population distribution was uneven, with a few large states such as California, Texas, and Florida continuing to dominate the total population. The fastest population growth was observed in the Southern and Western states, this means that people are moving to areas with better economies, lower living costs, and warmer climates.
