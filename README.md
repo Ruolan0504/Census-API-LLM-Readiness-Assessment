@@ -1,5 +1,7 @@
 # Census API Data Readiness Assessment for LLM Applications
 
+https://ruolan0504.github.io/Census-API-LLM-Readiness-Assessment/US-Population-Estimate-Analysis-and-Visualization.html
+
 ## Project Overview
 This project conducts a system-level evaluation of whether major U.S. Census Bureau datasets accessed through the Census API are suitable for downstream LLM-driven applications.  
 The focus is not on building a full system, but on assessing data accessibility, structural consistency, data quality, and practical usability.
